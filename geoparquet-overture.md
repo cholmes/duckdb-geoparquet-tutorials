@@ -183,3 +183,20 @@ COPY (SELECT id, updatetime, geometry from b) TO 'buildings-t.parquet' WITH (FOR
 
 Then `gpq convert buildings-t.parquet buildings.parquet`
 
+Buildings data structure:
+
+```
+CREATE TABLE buildings(
+    id VARCHAR,
+    updatetime VARCHAR,
+    "version" INTEGER,
+    "names" MAP(VARCHAR, MAP(VARCHAR, VARCHAR)[]),
+    "level" INTEGER,
+    height DOUBLE,
+    numfloors INTEGER,
+    "class" VARCHAR,
+    sources MAP(VARCHAR, VARCHAR)[],
+    bbox STRUCT(minx DOUBLE, maxx DOUBLE, miny DOUBLE, maxy DOUBLE),
+    geometry BLOB);;
+```
+
