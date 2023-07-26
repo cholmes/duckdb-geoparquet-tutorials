@@ -163,3 +163,23 @@ select isocountrycodealpha2, names->>'$.common[0].value', geometry from countrie
 
 (I'm assuming that 'local' is always first, but that may be a bad assumption. It'd be better to look for the 'language' value to be 'local', but I'm not sure how to do that - suggestions welcome).
 
+### Buildings
+
+(just notes for myself here for now).
+
+After download
+`create table buildings as (select * from read_parquet('202*'));` for directory after aws s3 cp or sync call (that has some other stuff in it), when duckdb is started in the directory.
+
+```
+COPY (SELECT * from b) TO 'buildings-tmp.fgb'
+WITH (FORMAT GDAL, DRIVER 'FlatGeobuf');
+```
+
+Write out just values that aren't complicated (to parse these out better later);
+
+```
+COPY (SELECT id, updatetime, geometry from b) TO 'buildings-t.parquet' WITH (FORMAT PARQUET);
+```
+
+Then `gpq convert buildings-t.parquet buildings.parquet`
+
