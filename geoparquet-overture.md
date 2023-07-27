@@ -200,3 +200,14 @@ CREATE TABLE buildings(
     geometry BLOB);;
 ```
 
+Join to get country:
+
+```
+ALTER TABLE buildings
+ADD COLUMN country_iso VARCHAR;
+
+UPDATE buildings
+SET country_iso = countries.isocountrycodealpha2
+FROM countries
+WHERE ST_Intersects(countries.geometry, ST_GeomFromWKB(buildings.geometry));
+```
