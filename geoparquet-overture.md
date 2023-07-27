@@ -211,3 +211,10 @@ SET country_iso = countries.isocountrycodealpha2
 FROM countries
 WHERE ST_Intersects(countries.geometry, ST_GeomFromWKB(buildings.geometry));
 ```
+
+Initial order by attempt:
+
+```
+COPY (SELECT * from b WHERE country = 'US' ORDER BY ST_X(ST_Centroid(ST_GeomFromWKB(geometry))),
+    ST_Y(ST_Centroid(ST_GeomFromWKB(geometry)))) TO 'buildings-us.parquet'
+```
