@@ -227,3 +227,8 @@ Statement to make a view for a smaller quadkey:
 CREATE VIEW buildings_l5 AS SELECT id, updatetime, "version", "names", "level", height, numfloors, "class", sources,
     bbox, geometry, quadkey, SUBSTR(quadkey, 1, 5) AS quadkey5, country_iso FROM buildings;
 ```
+
+The copy command I used is (used in a script, but just swap out for a specific quadkey):
+```
+    copy_cmd = f"COPY (SELECT * FROM buildings_l5 WHERE country_iso = 'US' AND quadkey5 = '{quad5}' ORDER BY quadkey) TO '{quad5}_temp.parquet' WITH (FORMAT PARQUET); "
+```
