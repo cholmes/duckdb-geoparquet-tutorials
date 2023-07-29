@@ -218,3 +218,12 @@ Initial order by attempt:
 COPY (SELECT * from b WHERE country = 'US' ORDER BY ST_X(ST_Centroid(ST_GeomFromWKB(geometry))),
     ST_Y(ST_Centroid(ST_GeomFromWKB(geometry)))) TO 'buildings-us.parquet'
 ```
+
+Code to add quadkeys is at https://github.com/opengeos/open-buildings/blob/e0825d25423b50c89754bd5b0975118db2cf3c68/open_buildings/overture-buildings-parquet-add-columns.py#L46
+
+Statement to make a view for a smaller quadkey:
+
+```
+CREATE VIEW buildings_l5 AS SELECT id, updatetime, "version", "names", "level", height, numfloors, "class", sources,
+    bbox, geometry, quadkey, SUBSTR(quadkey, 1, 5) AS quadkey5, country_iso FROM buildings;
+```
