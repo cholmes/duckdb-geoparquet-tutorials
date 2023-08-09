@@ -232,3 +232,79 @@ The copy command I used is (used in a script, but just swap out for a specific q
 ```
     copy_cmd = f"COPY (SELECT * FROM buildings_l5 WHERE country_iso = 'US' AND quadkey5 = '{quad5}' ORDER BY quadkey) TO '{quad5}_temp.parquet' WITH (FORMAT PARQUET); "
 ```
+
+### Getting data from source.coop
+
+```
+CREATE TABLE gg_park AS (SELECT ST_GeomFromWKB(geometry) AS geometry, JSON(names) AS names, JSON(height) as height from
+read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country/country_iso=US/*.parquet', hive_partitioning=1), WHERE 
+    bbox.minX > -122.5103 AND
+    bbox.maxX < -122.4543 AND
+    bbox.minY > 37.7658 AND
+    bbox.maxY < 37.7715);
+```
+
+```
+CREATE TABLE gg_park AS (SELECT * from 
+read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country/country_iso=US/20321.parquet', hive_partitioning=1), WHERE 
+    bbox.minX > -122.5103 AND
+    bbox.maxX < -122.4543 AND
+    bbox.minY > 37.7658 AND
+    bbox.maxY < 37.7715);
+```
+
+```
+SELECT count(*) from 
+read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country/country_iso=US/20321.parquet', hive_partitioning=1), WHERE 
+    bbox.minX > -122.5103 AND
+    bbox.maxX < -122.4543 AND
+    bbox.minY > 37.7658 AND
+    bbox.maxY < 37.7715;
+```
+
+```
+SELECT ST_GeomFromWKB(geometry) AS geometry, JSON(names) AS names, JSON(height) as height from '*.parquet' WHERE 
+    bbox.minX > -122.5103 AND
+    bbox.maxX < -122.4543 AND
+    bbox.minY > 37.7658 AND
+    bbox.maxY < 37.7715
+```
+
+```
+SELECT * from 
+read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/country_iso=US/20321_20000.parquet', hive_partitioning=1), WHERE 
+    bbox.minX > -122.5103 AND
+    bbox.maxX < -122.4543 AND
+    bbox.minY > 37.7658 AND
+    bbox.maxY < 37.7715;
+```
+
+```
+SELECT * from 
+read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/20321_5k.parquet'), WHERE 
+```
+
+```
+select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/country_iso=US/*.parquet'), WHERE quadkey LIKE '2032120231%';
+```
+
+```
+select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/country_iso=US/*.parquet'),
+    WHERE quadkey LIKE '2032120231%' AND
+    ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON((-122.5103 37.7658, -122.4543 37.7658, -122.4543 37.7715, -122.5103 37.7715, -122.5103 37.7658))'));
+```
+
+```
+load spatial;
+select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/*.parquet'),
+    WHERE quadkey LIKE '030230%' AND
+    ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((-76.272307 45.616715, -76.110399 45.462413, -76.053333 45.643628, -75.965744 45.403742, -75.848958 45.456828, -75.943183 45.294619, -76.378476 45.321687, -76.124997 45.375782, -76.342644 45.494982, -76.320083 45.552629, -76.320083 45.552629, -76.272307 45.616715))'));
+```
+
+```
+load spatial;
+select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-country-2/*.parquet'),
+    WHERE quadkey LIKE '12002332%' AND
+    ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((9.446443 56.207488, 9.432342 56.178091, 9.535293 56.16731, 9.467509 56.188492, 9.543958 56.190004, 9.446443 56.207488))'));
+```
+
