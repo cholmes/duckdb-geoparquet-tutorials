@@ -308,3 +308,23 @@ select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture
     ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((9.446443 56.207488, 9.432342 56.178091, 9.535293 56.16731, 9.467509 56.188492, 9.543958 56.190004, 9.446443 56.207488))'));
 ```
 
+```
+load spatial;
+select * from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-3/*/*.parquet'),
+WHERE quadkey LIKE '0213231%' AND
+ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((-103.440312 44.12233, -103.319886 44.12233, -103.319886 44.045527, -103.440312 44.045527, -103.440312 44.12233))'));
+```
+
+```
+load spatial;
+COPY (select id, updatetime, ST_AsWKB(ST_GeomFromWKB(geometry)) AS geometry, country_iso from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-3/*.parquet'),
+WHERE quadkey LIKE '0213231%' AND
+ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((-103.440312 44.12233, -103.319886 44.12233, -103.319886 44.045527, -103.440312 44.045527, -103.440312 44.12233))'))) TO 'buildings.geojson'
+WITH (FORMAT GDAL, DRIVER 'GeoJSON');
+```
+
+```
+COPY (select id, country_iso, ST_AsWKB(ST_GeomFromWKB(geometry)) AS geometry from read_parquet('s3://us-west-2.opendata.source.coop/cholmes/overture/geoparquet-3/*.parquet'),
+WHERE quadkey LIKE '2103213003%' AND
+ST_Within(ST_GeomFromWKB(geometry), ST_GeomFromText('POLYGON ((-58.53445 -34.64447, -58.570879 -34.660286, -58.597863 -34.615051, -58.514887 -34.599226, -58.542546 -34.627541, -58.542546 -34.627541, -58.53445 -34.64447))'))) TO 'buildings.fgb' WITH (FORMAT GDAL, DRIVER 'FlatGeobuf');
+```
