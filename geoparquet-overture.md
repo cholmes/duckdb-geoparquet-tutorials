@@ -150,6 +150,12 @@ WITH (FORMAT GDAL, DRIVER 'FlatGeobuf');
 
 (Remember you'll need to convert the output with ogr2ogr to get the srs, as [above](#correct-srs)
 
+state notes:
+
+```
+COPY (select type, subtype, localityType, adminLevel, isoCountryCodeAlpha2, JSON(names) AS names, JSON(sources) AS sources, ST_GeomFromWkb(geometry) AS geometry from locals where adminLevel = 4 AND ST_GeometryType(ST_GeomFromWkb(geometry)) IN ('POLYGON','MULTIPOLYGON')) TO 'states.fgb' WITH (FORMAT GDAL, DRIVER 'FlatGeobuf');
+```
+
 ### Extracting JSON
 
 So the JSON blobs aren't super useful, and it can be a pain to do the JSON extraction in a geospatial program. So we can also use DuckDB to 
