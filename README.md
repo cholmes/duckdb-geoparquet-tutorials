@@ -41,7 +41,7 @@ The following call selects all parquet files from the [`country=SSD`](https://be
 
 ```
 COPY (SELECT * FROM 
-    's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=SSD/*.parquet') 
+    's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=SSD/*.parquet') 
     TO 'south_sudan.parquet' (FORMAT PARQUET);
 ```
 
@@ -76,7 +76,7 @@ You can get the count of a file, just put in the S3 URL to the parquet file.
 
 ```
 SELECT count(*) FROM 
-   's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/Attapeu.parquet';
+   's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/Attapeu.parquet';
 ```
 
 Results in:
@@ -96,7 +96,7 @@ And you can see everything in it:
 
 ```
 SELECT * FROM 
-   's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/Attapeu.parquet';
+   's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/Attapeu.parquet';
 ```
 
 Which should get you a response like:
@@ -127,7 +127,7 @@ From there you can easily filter, like only show the largest buildings:
 
 ```
 SELECT * FROM 
-  's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/Attapeu.parquet'
+  's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/Attapeu.parquet'
   WHERE area_in_meters > 1000;
 ```
 
@@ -137,7 +137,7 @@ If you've got a fast connection you can easily just keep doing your sql queries 
 
 ```
 CREATE TABLE attapeu AS SELECT * EXCLUDE geometry, ST_GEOMFROMWKB(geometry) AS geometry FROM 
-'s3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/Attapeu.parquet';
+'s3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/Attapeu.parquet';
 ```
 
 This creates a true 'geometry' type from the well known binary 'geometry' field, which 
@@ -164,7 +164,7 @@ You also don't have to instantiate the table in DuckDB if your connection is fas
 
 ```
 COPY (SELECT * EXCLUDE geometry, ST_AsWKB(ST_GEOMFROMWKB(geometry)) AS geometry FROM 
-     's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/Attapeu.parquet') 
+     's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/Attapeu.parquet') 
      TO 'attapeu-2.fgb' WITH (FORMAT GDAL, DRIVER 'FlatGeobuf');
 ```
 
@@ -177,14 +177,14 @@ Using DuckDB with Parquet on S3 starts to really shine when you want to work wit
 With DuckDB and these GeoParquet files you can just use various * patterns to select multiple files and treat them as a single one:
 
 ```
-SELECT count(*) FROM 's3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/*.parquet';
+SELECT count(*) FROM 's3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/*.parquet';
 ```
 
 The above query gets you all the bulidings in Laos. If your connection is quite fast you can do all these calls directly on the parquet files. But for most it's easiest to load it locally:
 
 ```
 CREATE TABLE laos AS SELECT * EXCLUDE geometry, ST_GEOMFROMWKB(geometry) AS geometry FROM 
-'s3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=LAO/*.parquet';
+'s3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=LAO/*.parquet';
 ```
 
 From there it's easy to add more data. Let's rename our table to `se_asia` and then pull down
@@ -193,7 +193,7 @@ the data from Thailand as well:
 ```
 ALTER TABLE laos RENAME TO se_asia;
 INSERT INTO se_asia from (SELECT * EXCLUDE geometry, ST_GEOMFROMWKB(geometry) AS geometry FROM 
-'s3://us-west-2.opendata.source.coop/google-research-open-buildings/geoparquet-admin1/country=THA/*.parquet');
+'s3://us-west-2.opendata.source.coop/google-research-open-buildings/v2/geoparquet-admin1/country=THA/*.parquet');
 ```
 
 This will take a bit longer, as Thailand has about ten times the number of buildings of Laos. 
